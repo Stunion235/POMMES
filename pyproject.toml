@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+authors = [
+   { name = "Anirudh Tenneti", email = "at863@cornell.edu"},
+]
+name = "POMMES"
+version = "0.0.1"
+dependencies = [
+   "numpy",
+   "matplotlib",
+   "scipy",
+]

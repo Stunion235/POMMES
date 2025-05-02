@@ -1,10 +1,10 @@
-# POMMES v0.1
+# POMMES v1.0
 ## Peak-Ordering Measurement for Multi-Elemental Systems
 
 POMMES is a tool written in Python 3 for quantifying order in multi-elemental crystal systems such as perovskite crystals. We aim to deliver a GUI capable of estimating order in multiple crystal sites given ratios between peak intensities in data from X-ray diffraction (XRD).
 
-Currently, we have a Python script into which a user inputs peak ratios in order to obtain an order estimate. Enter intensity ratios between the 001/002, 001/004, and 001/006 peaks into `calc_structure_factor(L1,L2,ratio,color)` and `ratio` will be interpolated in the data for the 00L1/00L2 ratio, plotted in a chosen `color` for an occupancy estimate printed to the console.
-
-Supports EuTa2O6 and SrTa2O6 as of now and will later support other elements.
+`main.py` plots peak ratios versus order from two .cif files, one for the ordered and one for the disordered state. If given experimentally determined peak ratio, it can interpolate them to estimate the order in the sample.
+`xrdmlplotter.py` can plot XRD data from .xrdml or .csv files and extract peak data, and users can use it to calculate peak ratios required in `main.py`.
+`readCIF.py`, if run on two .cif files as above, will output a snippet of code that can be pasted into `preload.py` representing the necessary data from both .cifs. By setting `preload_matrices=True` in `main.py`, data will be loaded from `preload.py` instead of rereading the .cifs every time the code is run, saving time and computational power.
 
 Project initiated by Sonia Hasko and maintained by Anirudh Tenneti under the supervision of Tobias Schwaigert.
