@@ -129,9 +129,23 @@ def structure_factor(formfactors,disordered_matrix,ordered_matrix,hkl,order):
     Fs=np.zeros_like(formfactors,dtype="complex")
     for i in range(len(formfactors)):
         Fs[i]=interpolate(disordered_matrix[i,-1],ordered_matrix[i,-1],order)*formfactors[i]*math.e**(factor*np.dot(hkl,interpolate(disordered_matrix[i,0:3],ordered_matrix[i,0:3],order)))
-    # print(Fs)
-    # raise InterruptedError("d")
     return sum(Fs)
+def mult(hkl):
+    """
+    Get the multiplicity of a peak (number of equivalent peaks)
+
+    Parameters
+    ----------
+    hkl : list[int]
+        Miller indices [h,k,l] of the diffraction plane.
+
+    Returns
+    -------
+    int
+        Multiplicity.
+
+    """
+    return 2**(len(list(filter(lambda a:a!=0,hkl))))
 def intensity(S,d,wavelength):
     """
     Get the intensity of a peak given the structure factor and Plane spacing in Å.

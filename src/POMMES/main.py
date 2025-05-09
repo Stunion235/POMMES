@@ -52,11 +52,12 @@ for i in range(len(hkl)):
         #Get structure factors of both structures, compute intensity, and find ratio
         d=XRD.plane_spacing(p,[o,1-o]@abc_matrix)
         structurefactors.append(abs(XRD.structure_factor(XRD.form_factors(sites[:,1], d), disordered, ordered, p, o)))
-        intensities.append(XRD.intensity(structurefactors[-1],d,wavelength_in_Å))
+        intensities.append(XRD.mult(p)*XRD.intensity(structurefactors[-1],d,wavelength_in_Å))
         d=XRD.plane_spacing(p2,[o,1-o]@abc_matrix)
         structurefactors2.append(abs(XRD.structure_factor(XRD.form_factors(sites[:,1], d), disordered, ordered, p2, o)))
-        intensities2.append(XRD.intensity(structurefactors2[-1],d,wavelength_in_Å))
+        intensities2.append(XRD.mult(p2)*XRD.intensity(structurefactors2[-1],d,wavelength_in_Å))
         ratios.append(intensities[-1]/intensities2[-1])
+    # Unused code to plot the structure factors themselves
     # structurefactors=list(map(lambda o:abs(XRD.structure_factor(XRD.form_factors(sites[:,1], p, XRD.plane_spacing(p,[o,1-o]@abc_matrix)), disordered, ordered, p, o)),orderlevels))
     # ax1.plot(orderlevels*100,structurefactors,label=str(p[0])+str(p[1])+str(p[2]),color=colors[(i+1)%len(colors)])
     # ax1.plot(orderlevels*100,structurefactors2,label=str(p2[0])+str(p2[1])+str(p2[2]),color=colors[(i+2)%len(colors)])
@@ -67,7 +68,7 @@ for i in range(len(hkl)):
         interp_order=inter_func1(e)
         estimates.append(interp_order)
         ax1.scatter(interp_order, e, color=colors[i%len(colors)])
-        print('interpolated occupancy=' + str(interp_order/100) + ', ratio=' + str(e))
+        print('interpolated order=' + str(interp_order/100) + ', ratio=' + str(e))
 #Make plot
 if interpolate_experimental_values:
     avg=sum(estimates)/len(estimates)
