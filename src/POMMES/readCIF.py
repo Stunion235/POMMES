@@ -5,7 +5,10 @@ ordered_file='../../data/EuTaO3ordered.cif'
 import numpy as np
 def filename(path):
     """Extract filename from filepath"""
-    return path.split("/")[-1]
+    try:
+        return path.split("/")[-1]
+    except:
+        return ''
 def warn_user(alert,prompt):
     """Print warning and ask user whether or not to continue despite that"""
     print("Warning:",alert)
@@ -81,7 +84,7 @@ def validate_spacegroup(filename,lines):
     except IndexError:
         warn_user('No space group seems to be specified in the file '+filename+'.', 'Continue, assuming P 1?')
     return spacegroupline
-def get_lattice_constants(path):
+def get_lattice_constants(path,is_path=True):
     """
     Get the lattice constants a,b,c of a CIF file.
 
@@ -89,22 +92,29 @@ def get_lattice_constants(path):
     ----------
     path : str
         Path to a CIF file to read.
-
+    is_path : boolean
+        If True, `path` is a filepath, else it is the file's contents given by readlines().
+        
     Returns
     -------
     list[float]
         Latice constants [a,b,c].
 
     """
-    cif=open(path,'r')
-    lines=cif.readlines()
-    a=line_index_of(lines, "_cell_length_a",file=path)
-    b=line_index_of(lines, "_cell_length_b",file=path,start=a)
-    c=line_index_of(lines, "_cell_length_c",file=path,start=b)
-    cif.close()
+    lines=None
+    if is_path:
+        cif=open(path,'r')
+        lines=cif.readlines()
+        cif.close()
+    else:
+        lines=path
+    p=path if is_path else ''
+    a=line_index_of(lines, "_cell_length_a",file=p)
+    b=line_index_of(lines, "_cell_length_b",file=p,start=a)
+    c=line_index_of(lines, "_cell_length_c",file=p,start=b)
     return list(map(lambda i: float(lines[i].split()[1].replace("(","").replace(")","")),[a,b,c]))
 
-def make_cif_matrices(disordered_file,ordered_file):
+def make_cif_matrices(disordered_file,ordered_file,is_path=True):
     """
     Return matrices for the sites and atomic positions/occupancies in the
     disordered and ordered structures for interpolation purposes.
@@ -122,6 +132,8 @@ def make_cif_matrices(disordered_file,ordered_file):
         Path to a CIF file for the disordered structure.
     ordered_file : str
         Path to a CIF file for the ordered structure.
+    is_path : boolean
+        If True, the above files are paths, else they are the files' contents from readlines().
 
     Returns
     -------
@@ -139,10 +151,18 @@ def make_cif_matrices(disordered_file,ordered_file):
         Same as `disordered` but for the ordered CIF.
 
     """
-    disorderedCIF=open(disordered_file,'r')
-    linesD=disorderedCIF.readlines()
-    orderedCIF=open(ordered_file,'r')
-    linesO=orderedCIF.readlines()
+    linesD=None
+    linesO=None
+    if is_path:
+        disorderedCIF=open(disordered_file,'r') if is_path else disordered_file
+        orderedCIF=open(ordered_file,'r') if is_path else ordered_file
+        linesD=disorderedCIF.readlines()
+        linesO=orderedCIF.readlines()
+        disorderedCIF.close()
+        orderedCIF.close()
+    else:
+        linesD=disordered_file
+        linesO=ordered_file
     sites=[]
     def read_atoms(lines,filename='',start=0):
         pos=line_index_of(lines,'atom_site_label',start=start,file=filename)
@@ -220,8 +240,6 @@ def make_cif_matrices(disordered_file,ordered_file):
                 rowO=[0,0,0,0]
         disordered.append(rowD)
         ordered.append(rowO)
-    disorderedCIF.close()
-    orderedCIF.close()
     return np.array(sites), np.array(disordered), np.array(ordered)
 
 if __name__ == "__main__":
